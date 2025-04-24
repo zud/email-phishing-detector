@@ -2,6 +2,10 @@
 
 A lightweight, local, open-source tool to detect suspicious emails (phishing or spam) in `.eml` and `.msg` formats using a BERT Tiny-based AI model. Now optionally enhanced with domain reputation and header analysis.
 
+> ⚠️ **This project is intended for local/private use only.** If you plan to deploy it as a public-facing web application, please consider the privacy risks associated with handling sensitive email content. Public deployment is not recommended without appropriate security and compliance checks.
+
+> 📩 **Commercial use or enterprise integration?** Contact: [alessandro.bruchi@iit.it](mailto:alessandro.bruchi@iit.it)
+
 ---
 
 ## 🚀 Features
@@ -75,7 +79,7 @@ python phishing_agent.py
 phishing-agent/
 ├── phishing_agent.py         # Main script
 ├── requirements.txt          # Dependencies
-├── LICENSE                   # MIT License
+├── LICENSE                   # AGPLv3 License
 ├── README.md                 # Project documentation
 ├── .env.example              # Example env file for API config
 ├── examples/                 # Example emails
@@ -88,7 +92,7 @@ phishing-agent/
 ---
 
 ## 🛡️ License
-This project is licensed under the **MIT License**.
+This project is licensed under the **GNU Affero General Public License v3.0 (AGPLv3)**. See [LICENSE](LICENSE) for more information.
 
 ---
 
@@ -105,6 +109,6 @@ This project is licensed under the **MIT License**.
 
 ---
 
-![MIT License](https://img.shields.io/badge/license-MIT-green.svg)
+![AGPL License](https://img.shields.io/badge/license-AGPL--v3-blue.svg)
 ![Made with Python](https://img.shields.io/badge/Made%20with-Python-blue.svg)
 ![Status](https://img.shields.io/badge/status-working-brightgreen)

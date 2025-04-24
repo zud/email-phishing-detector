@@ -1,0 +1,29 @@
+# 📜 Changelog – Phishing Agent
+
+All notable changes to this project will be documented in this file.
+
+---
+
+## [1.0.0] - 2025-04-24
+### 🚀 Initial official release
+- First complete version of `phishing_agent.py` with support for:
+  - `.eml` and `.msg` file parsing
+  - AI-based spam/phishing classification using BERT Tiny
+  - Optional advanced header and domain reputation analysis via APIVoid
+- Modular configuration for base or advanced mode
+- Includes `.env.example` for API key management
+
+### 📄 License change
+- Changed project license from MIT to **GNU AGPLv3**
+- Rationale: protect open-source usage while enabling commercial licensing in the future
+- See [LICENSE](LICENSE) for full terms
+
+### 📩 Commercial use
+- For enterprise/commercial licensing options, contact: [alessandro.bruchi@iit.it](mailto:alessandro.bruchi@iit.it)
+
+---
+
+## [0.9.0] - Internal testing only
+- Early prototype used MIT license
+- Included only base mode with BERT analysis
+- Not intended for public release
