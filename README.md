@@ -31,7 +31,7 @@ A lightweight, local, open-source tool to detect suspicious emails (phishing or 
 
 ```bash
 # Clone the repository
-https://github.com/your-username/phishing-agent.git
+https://github.com/zud/email-phishing-detector/phishing-agent.git
 cd phishing-agent
 
 # Create and activate virtual environment
