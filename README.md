@@ -12,10 +12,11 @@ A lightweight, local, open-source tool to detect suspicious emails (phishing or 
 - Local analysis (no data sent externally by default)
 - Supports `.eml` and `.msg` (Outlook) email formats
 - Spam / legitimate classification using a fine-tuned BERT model
-- Optional advanced mode:
-  - Mismatch detection (From vs Return-Path)
-  - Reputation check via [APIVoid](https://www.apivoid.com)
-- Clear output in terminal and `.txt` file
+- Three operational modes:
+  - **Base**: AI-based classification only
+  - **Advanced**: Includes header and sender reputation checks (APIVoid)
+  - **GUI**: Interactive drag-and-drop interface via Streamlit
+- Clear output in terminal and `.txt` report
 
 ---
 
@@ -50,39 +51,40 @@ pip install -r requirements.txt
 
 ---
 
-## 📨 How to Use
+## 🧪 Usage
 
-### Base mode (BERT only):
-```python
-USE_ADVANCED_ANALYSIS = False
+### 🖥️ Command-line (CLI) modes
+
+#### Base mode:
+```bash
+python phishing_agent.py path/to/email.eml --mode basic
 ```
 
-### Advanced mode (headers + domain reputation):
-1. Create a `.env` file from `.env.example`
-2. Add your APIVoid API key:
+#### Advanced mode (with header analysis and domain reputation):
 ```bash
-APIVOID_API_KEY=your_real_api_key_here
+python phishing_agent.py path/to/email.msg --mode advanced
 ```
-3. In the script, set:
-```python
-USE_ADVANCED_ANALYSIS = True
-```
-4. Run the script:
+
+> 💡 Make sure you set your APIVoid key in a `.env` file if using advanced mode.
+
+### 📊 Graphical interface (GUI)
 ```bash
-python phishing_agent.py
+streamlit run phishing_app.py
 ```
+Upload a `.eml` or `.msg` file and the AI will analyze the content.
 
 ---
 
 ## 📁 Project Structure
 ```
 phishing-agent/
-├── phishing_agent.py         # Main script
+├── phishing_agent.py         # CLI analysis script
+├── phishing_app.py           # GUI interface via Streamlit
 ├── requirements.txt          # Dependencies
 ├── LICENSE                   # AGPLv3 License
 ├── README.md                 # Project documentation
 ├── .env.example              # Example env file for API config
-├── CHANGELOG.md              # Version history and license change log
+├── CHANGELOG.md              # Version history and license info
 ├── examples/                 # Example emails
 │   ├── sample_email.eml
 │   └── sample_email.msg
@@ -106,11 +108,11 @@ _This project was developed with the assistance of OpenAI’s ChatGPT, which pro
 
 ## 💡 Future Ideas
 - GPT integration for ensemble decision-making
-- Full dashboard via Streamlit or Electron
-- Webhook notifications for alerts
+- Email inbox watcher with automated checks
+- Full dashboard with Streamlit Cloud or Hugging Face Spaces
 
 ---
 
 ![AGPL License](https://img.shields.io/badge/license-AGPL--v3-blue.svg)
 ![Made with Python](https://img.shields.io/badge/Made%20with-Python-blue.svg)
-![Status](https://img.shields.io/badge/status-working-brightgreen)
+![Status](https://img.shields.io/badge/status-active-brightgreen)
