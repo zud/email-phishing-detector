@@ -1,0 +1,1 @@
+This is a placeholder. Use a real .msg file in practice.
