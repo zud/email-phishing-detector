@@ -46,4 +46,53 @@ pip install -r requirements.txt
 
 ## 📨 How to Use
 
-1. Place a `.eml` or `.msg` email file in the
+1. Place a `.eml` or `.msg` email file in the project directory
+2. Edit the file path inside `phishing_agent.py` if needed
+3. Run the script:
+```bash
+python phishing_agent.py
+```
+4. Review the output in the terminal and in the `analysis_result.txt` file
+
+---
+
+## 📁 Project Structure
+```
+phishing-agent/
+├── phishing_agent.py         # Main script
+├── requirements.txt          # Dependencies
+├── LICENSE                   # MIT License
+├── README.md                 # Project documentation
+├── examples/                 # Example emails
+│   ├── sample_email.eml
+│   └── sample_email.msg
+├── docs/                     # Deployment and usage docs
+│   └── guida_deploy.md
+├── screenshots/              # Visuals for README
+│   └── demo_terminal.png
+```
+
+---
+
+## 🛡️ License
+This project is licensed under the **MIT License**.
+
+---
+
+## 👤 Authors
+- Alessandro Bruchi – [alessandro.bruchi@iit.it](mailto:alessandro.bruchi@iit.it)
+- In collaboration with ChatGPT (OpenAI)
+
+---
+
+## 💡 Future Ideas
+- GPT integration for ensemble decision-making
+- Analysis of headers and suspicious links
+- Web dashboard via Streamlit
+- Outlook/Thunderbird plugin
+
+---
+
+![MIT License](https://img.shields.io/badge/license-MIT-green.svg)
+![Made with Python](https://img.shields.io/badge/Made%20with-Python-blue.svg)
+![Status](https://img.shields.io/badge/status-working-brightgreen)
