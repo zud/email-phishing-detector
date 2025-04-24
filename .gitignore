@@ -6,3 +6,4 @@ venv/
 .env
 examples/*.eml
 examples/*.msg
+analysis_result.txt
