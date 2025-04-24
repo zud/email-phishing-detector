@@ -2,3 +2,4 @@ mail-parser
 extract-msg
 transformers
 torch
+streamlit

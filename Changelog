@@ -1,29 +1,46 @@
 # 📜 Changelog – Phishing Agent
 
-All notable changes to this project will be documented in this file.
+All notable changes to this project are documented here.
+
+---
+
+## [1.1.0] - 2025-04-24
+### ✨ New Features
+- Added `phishing_app.py`: graphical interface (GUI) using Streamlit
+- Users can drag and drop `.eml` or `.msg` files
+- Introduced checkbox in UI to enable "advanced mode":
+  - Mismatch detection (`From:` vs `Return-Path:`)
+  - Sender domain reputation check via APIVoid API
+
+### 🛠 Enhancements
+- Split analysis into 3 user-selectable modes:
+  - `basic` – AI only
+  - `advanced` – AI + header checks
+  - `gui` – new graphical interface
+- Updated CLI script (`phishing_agent.py`) to support `--mode` flag
+- Updated `requirements.txt` with `streamlit`
+- Clarified project usage in new `README.md`
+
+### 📄 Documentation
+- Added full Streamlit UI walkthrough
+- Noted collaborative assistance from ChatGPT
+- Improved legal and licensing notices
 
 ---
 
 ## [1.0.0] - 2025-04-24
 ### 🚀 Initial official release
 - First complete version of `phishing_agent.py` with support for:
-  - `.eml` and `.msg` file parsing
+  - `.eml` and `.msg` email parsing
   - AI-based spam/phishing classification using BERT Tiny
-  - Optional advanced header and domain reputation analysis via APIVoid
+  - Optional advanced header/domain analysis
 - Modular configuration for base or advanced mode
-- Includes `.env.example` for API key management
+- Includes `.env.example` for API key setup
 
-### 📄 License change
-- Changed project license from MIT to **GNU AGPLv3**
-- Rationale: protect open-source usage while enabling commercial licensing in the future
-- See [LICENSE](LICENSE) for full terms
+### 📄 License
+- Project released under **GNU AGPLv3** (formerly MIT)
+- See [LICENSE](LICENSE) for details
 
 ### 📩 Commercial use
-- For enterprise/commercial licensing options, contact: [alessandro.bruchi@iit.it](mailto:alessandro.bruchi@iit.it)
+- For enterprise licensing: [alessandro.bruchi@iit.it](mailto:alessandro.bruchi@iit.it)
 
----
-
-## [0.9.0] - Internal testing only
-- Early prototype used MIT license
-- Included only base mode with BERT analysis
-- Not intended for public release
