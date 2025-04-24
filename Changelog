@@ -4,6 +4,36 @@ All notable changes to this project are documented here.
 
 ---
 
+## [1.2.0] - 2025-04-24
+### ✨ New Features
+- 🆕 **GUI Alignment**: Updated `phishing_app_gui.py` (formerly `phishing_app.py`) to fully match CLI functionality:
+  - AI-only mode
+  - Header analysis mode (typosquatting, APIVoid)
+  - PhishTank URL checks
+- 🔍 **Enhanced Phishing Analysis**:
+  - Added structured header scoring
+  - Clear API key warnings for PhishTank and APIVoid
+  - Standardized URL cleanup and domain extraction logic
+
+### ✅ Improvements
+- 🧼 Cleaned console output and status messaging in both CLI and GUI
+- 🧾 Created `.env.example` to guide API key configuration
+- 🗂 Reorganized structure for consistency:
+  - Renamed GUI script to `phishing_app_gui.py`
+  - Introduced `analysis_result.txt` output standard
+- 📦 New `requirements.txt` to consolidate dependencies across CLI and GUI
+
+### 📄 Documentation
+- 🆕 Completely rewritten `README.md`
+  - Unified instructions for CLI and GUI
+  - Includes advanced mode and security warnings
+- 🧾 Added new `CHANGELOG.md`
+
+### 🗑️ Removed
+- ❌ **DNSTwist logic** removed from scoring due to real-world detection inconsistencies
+
+---
+
 ## [1.1.0] - 2025-04-24
 ### ✨ New Features
 - Added `phishing_app.py`: graphical interface (GUI) using Streamlit
@@ -43,4 +73,3 @@ All notable changes to this project are documented here.
 
 ### 📩 Commercial use
 - For enterprise licensing: [alessandro.bruchi@iit.it](mailto:alessandro.bruchi@iit.it)
-
