@@ -82,6 +82,7 @@ phishing-agent/
 ├── LICENSE                   # AGPLv3 License
 ├── README.md                 # Project documentation
 ├── .env.example              # Example env file for API config
+├── CHANGELOG.md              # Version history and license change log
 ├── examples/                 # Example emails
 │   ├── sample_email.eml
 │   └── sample_email.msg
@@ -98,7 +99,8 @@ This project is licensed under the **GNU Affero General Public License v3.0 (AGP
 
 ## 👤 Authors
 - Alessandro Bruchi – [alessandro.bruchi@iit.it](mailto:alessandro.bruchi@iit.it)
-- In collaboration with ChatGPT (OpenAI)
+
+_This project was developed with the assistance of OpenAI’s ChatGPT, which provided non-binding suggestions during implementation._
 
 ---
 
