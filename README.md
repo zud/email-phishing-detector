@@ -2,48 +2,49 @@
 
 A lightweight, local, open-source tool to detect suspicious emails (phishing or spam) in `.eml` and `.msg` formats using a BERT Tiny-based AI model. Now optionally enhanced with domain reputation and header analysis.
 
-> ⚠️ **This project is intended for local/private use only.** If you plan to deploy it as a public-facing web application, please consider the privacy risks associated with handling sensitive email content. Public deployment is not recommended without appropriate security and compliance checks.
+> ⚠️ **This project is intended for local/private use only.** Public deployment is not recommended without appropriate security and compliance assessments.
 
 > 📩 **Commercial use or enterprise integration?** Contact: [alessandro.bruchi@iit.it](mailto:alessandro.bruchi@iit.it)
 
 ---
 
 ## 🚀 Features
-- Local analysis (no data sent externally by default)
-- Supports `.eml` and `.msg` (Outlook) email formats
-- Spam / legitimate classification using a fine-tuned BERT model
-- Three operational modes:
-  - **Base**: AI-based classification only
-  - **Advanced**: Includes header and sender reputation checks (APIVoid)
-  - **GUI**: Interactive drag-and-drop interface via Streamlit
-- Clear output in terminal and `.txt` report
+
+- 🧠 Local AI-based classification with no cloud dependency
+- 📂 Support for `.eml` and `.msg` (Outlook) email formats
+- 🤖 Three operational modes:
+  - **Basic**: BERT-based classification only
+  - **Advanced**: Adds sender reputation (via APIVoid), typosquatting detection, and URL phishing checks (via PhishTank)
+  - **GUI**: Web interface using Streamlit for file upload and analysis
+- 📊 Results printed in console and saved in `analysis_result.txt`
+- ✅ Optional `.env` config for API keys
 
 ---
 
 ## 🧠 AI Model Used
-- **Model:** `mrm8488/bert-tiny-finetuned-sms-spam-detection`
-- **Type:** BERT Tiny
-- **Task:** Binary classification: spam vs. not spam
-- **Highlights:**
-  - Runs locally on CPU
-  - No cloud processing needed for base detection
+
+- **Model**: [`mrm8488/bert-tiny-finetuned-sms-spam-detection`](https://huggingface.co/mrm8488/bert-tiny-finetuned-sms-spam-detection)
+- **Purpose**: Spam/phishing vs. ham (binary classification)
+- **Highlights**:
+  - Lightweight & fast (BERT Tiny)
+  - Works locally on CPU
 
 ---
 
 ## ⚙️ Installation
 
-### 🔧 Prerequisites
+### 🔧 Requirements
 - Python 3.10+
 - Virtual environment (recommended)
 
 ```bash
 # Clone the repository
-https://github.com/your-username/phishing-agent.git
+https://github.com/zud/email-phishing-detector.git
 cd phishing-agent
 
 # Create and activate virtual environment
 python -m venv venv
-venv\Scripts\activate  # or source venv/bin/activate on macOS/Linux
+source venv/bin/activate  # or venv\Scripts\activate on Windows
 
 # Install dependencies
 pip install -r requirements.txt
@@ -55,61 +56,67 @@ pip install -r requirements.txt
 
 ### 🖥️ Command-line (CLI) modes
 
-#### Base mode:
+#### 🔹 Basic mode:
 ```bash
 python phishing_agent.py path/to/email.eml --mode basic
 ```
 
-#### Advanced mode (with header analysis and domain reputation):
+#### 🔹 Advanced mode:
 ```bash
-python phishing_agent.py path/to/email.msg --mode advanced
+python streamlit run phishing_app.py path/to/email.msg --mode advanced
 ```
-
-> 💡 Make sure you set your APIVoid key in a `.env` file if using advanced mode.
+> Requires `.env` with your API keys for APIVoid and/or PhishTank.
 
 ### 📊 Graphical interface (GUI)
 ```bash
 streamlit run phishing_app.py
 ```
-Upload a `.eml` or `.msg` file and the AI will analyze the content.
+Upload an email file and select the analysis mode in your browser.
 
 ---
 
 ## 📁 Project Structure
 ```
 phishing-agent/
-├── phishing_agent.py         # CLI analysis script
-├── phishing_app.py           # GUI interface via Streamlit
-├── requirements.txt          # Dependencies
-├── LICENSE                   # AGPLv3 License
-├── README.md                 # Project documentation
-├── .env.example              # Example env file for API config
-├── CHANGELOG.md              # Version history and license info
-├── examples/                 # Example emails
+├── phishing_agent.py  # CLI logic with all features
+├── phishing_app.py               # Streamlit GUI frontend
+├── requirements.txt                  # All dependencies
+├── .env.example                      # Sample environment file
+├── LICENSE                           # AGPLv3 License
+├── README.md                         # Project documentation
+├── CHANGELOG.md                      # Release and update notes
+├── examples/                         # Example email files
 │   ├── sample_email.eml
 │   └── sample_email.msg
-├── docs/                     # Deployment and usage docs
+├── docs/                             # Usage and deployment docs
 │   └── guida_deploy.md
 ```
 
 ---
 
 ## 🛡️ License
-This project is licensed under the **GNU Affero General Public License v3.0 (AGPLv3)**. See [LICENSE](LICENSE) for more information.
+
+This project is licensed under the **GNU Affero General Public License v3.0 (AGPLv3)**.
+
+See [LICENSE](LICENSE) for full terms.
 
 ---
 
-## 👤 Authors
-- Alessandro Bruchi – [alessandro.bruchi@iit.it](mailto:alessandro.bruchi@iit.it)
+## 👤 Author
 
-_This project was developed with the assistance of OpenAI’s ChatGPT, which provided non-binding suggestions during implementation._
+**Alessandro Bruchi**  
+[alessandro.bruchi@iit.it](mailto:alessandro.bruchi@iit.it)
+
+> _Built in collaboration with OpenAI’s ChatGPT for architectural and implementation guidance._
 
 ---
 
 ## 💡 Future Ideas
-- GPT integration for ensemble decision-making
-- Email inbox watcher with automated checks
-- Full dashboard with Streamlit Cloud or Hugging Face Spaces
+
+- 🧠 GPT-based ensemble phishing evaluator
+- 🔔 Email inbox monitoring (IMAP/POP)
+- 📊 Dashboard via Streamlit Cloud or Hugging Face Spaces
+- 🔐 DKIM/SPF/DMARC inspection module
 
 ---
 
