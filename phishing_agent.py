@@ -1,197 +1,196 @@
-# phishing_agent_with_phishtank.py – Command-Line Phishing Analyzer (Stable Version without DNSTwist)
+# phishing_agent.py – CLI Phishing Analyzer v1.3.0 Final (Fully Silenced + Advanced Logic)
 
 import os
 import re
-import mailparser
-import extract_msg
+import sys
+import io
+import traceback
+import contextlib
 import requests
-import argparse
-from transformers import pipeline, AutoTokenizer
+from bs4 import BeautifulSoup
+from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
 from dotenv import load_dotenv
+from email import policy
+from email.parser import BytesParser
+import extract_msg
 from fuzzywuzzy import fuzz
 
-# === ENV SETUP ===
+# === Force UTF-8 for console ===
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
+# === Suppress stdout and stderr completely ===
+@contextlib.contextmanager
+def suppress_stdout():
+    with open(os.devnull, 'w') as fnull:
+        fd_stdout = sys.stdout.fileno()
+        fd_stderr = sys.stderr.fileno()
+        saved_stdout = os.dup(fd_stdout)
+        saved_stderr = os.dup(fd_stderr)
+        os.dup2(fnull.fileno(), fd_stdout)
+        os.dup2(fnull.fileno(), fd_stderr)
+        try:
+            yield
+        finally:
+            os.dup2(saved_stdout, fd_stdout)
+            os.dup2(saved_stderr, fd_stderr)
+
+# === ENV ===
 load_dotenv()
-API_KEY_APIVOID = os.getenv("APIVOID_API_KEY", "")
-PHISHTANK_API_KEY = os.getenv("PHISHTANK_API_KEY", "")
-
-# === ARGPARSE ===
-parser = argparse.ArgumentParser(description="Phishing detection script with PhishTank integration")
-parser.add_argument("file", help="Path to .eml or .msg email file")
-parser.add_argument("--mode", choices=["basic", "advanced"], default="basic", help="Analysis mode")
-args = parser.parse_args()
-
-email_path = args.file
-use_advanced = args.mode == "advanced"
-
-ext = os.path.splitext(email_path)[1].lower()
-
-# === EMAIL PARSING ===
-if ext == ".eml":
-    with open(email_path, "rb") as f:
-        content = f.read().decode("utf-8", errors="ignore")
-    parsed = mailparser.parse_from_string(content)
-    subject = parsed.subject
-    body = parsed.body
-    sender = parsed.from_[0][1] if parsed.from_ else ""
-    return_path = parsed.return_path[0] if parsed.return_path else ""
-elif ext == ".msg":
-    msg = extract_msg.Message(email_path)
-    subject = msg.subject
-    body = msg.body
-    sender = msg.sender or ""
-    return_path = ""
-else:
-    raise ValueError("Unsupported file type. Use .eml or .msg")
-
-print("--- SUBJECT ---\n", subject)
-print("\n--- BODY ---\n", body)
-print("\n--- SENDER ---\n", sender)
-print("--- RETURN PATH ---\n", return_path)
-
-# === BERT AI DETECTION ===
-classifier = pipeline("text-classification", model="mrm8488/bert-tiny-finetuned-sms-spam-detection")
-tokenizer = AutoTokenizer.from_pretrained("mrm8488/bert-tiny-finetuned-sms-spam-detection")
-
-inputs = tokenizer(body, truncation=True, max_length=512)
-decoded_input = tokenizer.decode(inputs["input_ids"], skip_special_tokens=True)
-result = classifier(decoded_input)
-ai_score = result[0]['score'] if result[0]['label'] == 'LABEL_1' else 1 - result[0]['score']
+HUGGINGFACE_TOKEN = os.getenv("HUGGINGFACE_TOKEN")
+APIVOID_KEY = os.getenv("APIVOID_KEY")
 
 # === HELPERS ===
-def extract_domain(email):
-    return email.split("@")[-1].lower().strip(" >") if "@" in email else ""
+def load_email(path):
+    ext = os.path.splitext(path)[1].lower()
+    if ext == ".eml":
+        with open(path, 'rb') as f:
+            msg = BytesParser(policy=policy.default).parse(f)
+        subject = msg.get('subject', "")
+        sender = msg.get('from', "")
+        body = ""
+        if msg.is_multipart():
+            for part in msg.walk():
+                if part.get_content_type() == 'text/plain':
+                    body += part.get_content()
+        else:
+            body = msg.get_content()
+    elif ext == ".msg":
+        msg = extract_msg.Message(path)
+        subject = msg.subject or ""
+        sender = msg.sender or ""
+        body = msg.body or ""
+    else:
+        raise ValueError("Unsupported file type")
+    return subject.strip(), body.strip(), sender.strip()
 
-def extract_urls(text):
-    return re.findall(r'https?://\S+', text)
-
-def clean_url(url):
-    return url.strip('>"\' ')
-
-def check_domain_reputation(domain):
-    if not API_KEY_APIVOID:
-        print("ℹ️ APIVoid API key not set. Domain reputation checks are disabled.")
-        return 0.0
-    try:
-        url = f"https://endpoint.apivoid.com/domainbl/v1/pay-as-you-go/?key={API_KEY_APIVOID}&host={domain}"
-        r = requests.get(url)
-        data = r.json()
-        detections = data.get("data", {}).get("report", {}).get("blacklists", {}).get("detections", 0)
-        print(f"APIVoid score for {domain}: {detections} detections")
-        return min(detections / 5, 1.0)
-    except:
-        return 0.0
-
-def check_typosquatting(domain):
+def check_typo_squatting(address):
+    domain = address.split('@')[-1]
     common_brands = ["microsoft", "google", "apple", "amazon", "paypal", "facebook", "linkedin", "outlook", "gmail", "poste"]
     root = domain.split(".")[0].split("-")[0] if domain else ""
     for brand in common_brands:
         if fuzz.ratio(root, brand) >= 85:
             print(f"⚠️ Typosquatting: '{domain}' resembles '{brand}'")
-            return True
-    return False
+            return 1.0
+    return 0.0
 
-def check_phishtank_url(url):
-    if not PHISHTANK_API_KEY:
-        print("ℹ️ PhishTank API key not set. URL reputation checks are disabled.")
-        return False
-    try:
-        r = requests.post(
-            "https://checkurl.phishtank.com/checkurl/",
-            data={"url": url, "format": "json", "app_key": PHISHTANK_API_KEY},
-            headers={"User-Agent": "phishing_agent/1.0"}
-        )
-        res = r.json()
-        if res['results']['in_database']:
-            if res['results']['valid']:
-                print(f"⚠️ PhishTank reports phishing for: {url}")
-                return True
-            else:
-                print(f"✅ URL checked: {url} is not a valid phishing report in PhishTank.")
-        else:
-            print(f"✅ URL checked: {url} not found in PhishTank database.")
-    except:
-        print(f"⚠️ Could not check PhishTank for URL: {url}")
-    return False
+def check_apivoid_links(text):
+    if not APIVOID_KEY:
+        return 0.0
+    urls = re.findall(r'(https?://\S+)', text)
+    score = 0.0
+    for url in urls:
+        try:
+            r = requests.get(f"https://endpoint.apivoid.com/urlrep/v1/pay-as-you-go/?key={APIVOID_KEY}&url={url}")
+            data = r.json()
+            if data['data']['report']['blacklists']['detections'] > 0:
+                score += 0.5
+        except:
+            continue
+    return min(score, 1.0)
 
-# === ADVANCED ANALYSIS ===
-sender_domain = extract_domain(sender)
-return_domain = extract_domain(return_path)
-header_score = 0.0
-header_score_valid = False
-typosquatting_flag = False
-phishtank_flag = False
+def contains_suspicious_words(text):
+    keywords = ["urgent", "verify", "update", "click", "login", "password"]
+    hits = sum(1 for kw in keywords if kw in text.lower())
+    return min(hits * 0.2, 1.0)
 
-if use_advanced:
-    print(f"Sender domain: {sender_domain}")
-    print(f"Return-Path domain: {return_domain}")
+# === MAIN ===
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--show", nargs="*", choices=["subject", "body", "headers", "sender", "all"], help="Show selected parts of the email")
+parser.add_argument("file", help="Email file path")
+parser.add_argument("--mode", choices=["basic", "advanced"], default="basic")
+args = parser.parse_args()
+show_parts = args.show or []
 
-    if not API_KEY_APIVOID:
-        print("⚠️ APIVoid: API key not provided. This feature is inactive in advanced mode.")
-    if not PHISHTANK_API_KEY:
-        print("⚠️ PhishTank: API key not provided. This feature is inactive in advanced mode.")
+try:
+    subject, raw_body, sender = load_email(args.file)
+    soup = BeautifulSoup(raw_body, "html.parser")
+    clean_body = soup.get_text(separator=" ", strip=True)
 
-    if sender_domain:
-        rep_score = check_domain_reputation(sender_domain)
-        if rep_score > 0:
-            header_score += rep_score
-            header_score_valid = True
+    if "all" in show_parts or "subject" in show_parts:
+        print("\n--- SUBJECT ---\n" + subject)
+    if "all" in show_parts or "body" in show_parts:
+        print("\n--- BODY ---\n" + clean_body)
+    if "all" in show_parts or "headers" in show_parts or "sender" in show_parts:
+        print("\n--- SENDER ---\n" + sender)
 
-    if sender_domain and return_domain and sender_domain != return_domain:
-        print("⚠️ Mismatch between sender and return-path")
-        header_score += 0.5
-        header_score_valid = True
+    combined_text = f"{subject}\n{clean_body}"
 
-    if check_typosquatting(sender_domain):
-        typosquatting_flag = True
+    models = [
+        ("mrm8488/bert-tiny-finetuned-sms-spam-detection", "BERT Tiny"),
+        ("bhadresh-savani/bert-base-go-emotion", "Emotion Proxy"),
+        ("j-hartmann/emotion-english-distilroberta-base", "Hartmann Emotion")
+    ]
 
-    urls = extract_urls(body)
-    if urls:
-        print("\n🔎 Checking URLs against PhishTank...")
-        for url in urls:
-            cleaned = clean_url(url)
-            if check_phishtank_url(cleaned):
-                phishtank_flag = True
-                break
-    else:
-        print("ℹ️ No URLs found in email body for PhishTank checking.")
+    scores = []
+    labels = []
 
-    header_score = min(header_score, 1.0)
+    for model_name, label in models:
+        try:
+            with suppress_stdout():
+                tok = AutoTokenizer.from_pretrained(model_name, token=HUGGINGFACE_TOKEN)
+                mod = AutoModelForSequenceClassification.from_pretrained(model_name, token=HUGGINGFACE_TOKEN)
+                pipe = pipeline("text-classification", model=mod, tokenizer=tok, device=-1)
+            res = pipe(combined_text[:512])[0]
+            lbl = res['label'].lower()
+            score = res['score'] if 'spam' in lbl or lbl in ['anger', 'disgust', 'fear'] else 1 - res['score']
+            tag = 'spam' if score > 0.5 else 'ham'
+            scores.append(score)
+            labels.append(tag)
+            print(f"✅ Model {label}: {score:.2f} ({tag})")
+        except Exception as e:
+            scores.append(0.5)
+            labels.append("error")
+            print(f"⚠️ Model {label} failed. Neutral score used.")
 
-# === FINAL SCORE ===
-if use_advanced:
+    spam_votes = labels.count("spam")
+    avg_score = round(sum(scores) / len(scores), 2)
+
+    # Advanced logic
     critical_reasons = []
-    if typosquatting_flag:
-        critical_reasons.append("typosquatting")
-    if phishtank_flag:
-        critical_reasons.append("phishtank URL match")
+    if args.mode == "advanced":
+        print("\n🔍 Advanced Analysis:")
+        typo_subject = check_typo_squatting(subject)
+        typo_sender = check_typo_squatting(sender)
+        typo_score = max(typo_subject, typo_sender)
+        if typo_score >= 1.0:
+            critical_reasons.append("typosquatting")
+        apivoid_score = check_apivoid_links(combined_text)
+        keyword_score = contains_suspicious_words(combined_text)
 
-    if critical_reasons:
-        reason_text = ", ".join(critical_reasons)
-        print(f"🔴 Critical indicator detected ({reason_text}): forcing score to 1.0")
-        final_score = 1.0
-    elif header_score_valid:
-        final_score = round(0.6 * ai_score + 0.4 * header_score, 2)
+        print(f"🔠 TypoSquatting Score (subject or sender): {typo_score:.2f}")
+        print(f"🌐 APIVoid Link Score: {apivoid_score:.2f}")
+        print(f"📝 Suspicious Words Score: {keyword_score:.2f}")
+
+        advanced_score = round((typo_score + apivoid_score + keyword_score) / 3, 2)
+        print(f"🧠 Advanced Score: {advanced_score:.2f}")
+
+        if advanced_score == 0.0:
+            print("⚪ Nessun segnale avanzato rilevato. Verrà usato solo lo score basic per la valutazione finale.")
+
+        if critical_reasons:
+            reason_text = ", ".join(critical_reasons)
+            print(f"🔴 Critical indicator detected ({reason_text}): forcing score to 1.0")
+            combined_score = 1.0
+        else:
+            combined_score = round((avg_score + advanced_score) / 2, 2)
     else:
-        final_score = round(ai_score, 2)
-else:
-    final_score = round(ai_score, 2)
+        combined_score = avg_score
 
-label = "Phishing" if final_score >= 0.65 else "Legitimate"
+    if combined_score == 1.0:
+        verdict = "Phishing"
+    elif spam_votes >= 2 or avg_score > 0.6:
+        verdict = "Phishing"
+    elif spam_votes == 1 or avg_score > 0.4 or max(scores) > 0.4:
+        verdict = "Suspicious"
+    else:
+        verdict = "Legitimate"
 
-# === OUTPUT ===
-print(f"\nAI score: {ai_score:.2f}")
-if use_advanced:
-    print(f"Header score: {header_score:.2f}")
-print(f"Final score: {final_score} → {label}")
+    print(f"\n📊 Final Score: {combined_score:.2f} → {verdict}")
+    print(f"→ Based on {spam_votes} spam votes out of {len(models)}")
 
-with open("analysis_result.txt", "w", encoding="utf-8") as f:
-    f.write(f"Subject: {subject}\n")
-    f.write(f"Sender: {sender}\n")
-    f.write(f"Return-Path: {return_path}\n")
-    f.write(f"AI Score: {ai_score:.2f}\n")
-    if use_advanced:
-        f.write(f"Header Score: {header_score:.2f}\n")
-        f.write(f"Typosquatting: {typosquatting_flag}\n")
-        f.write(f"PhishTank URL Match: {phishtank_flag}\n")
-    f.write(f"Final Score: {final_score} → {label}\n")
+except Exception as e:
+    with open("error_log.txt", "w", encoding="utf-8") as f:
+        f.write("=== ERROR LOG ===\n")
+        f.write(traceback.format_exc())
+    print("❌ Fatal error. Check error_log.txt.")

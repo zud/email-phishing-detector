@@ -8,3 +8,4 @@ examples/*.eml
 examples/*.msg
 analysis_result.txt
 temp.msg
+error_log.txt

@@ -6,6 +6,27 @@ A lightweight, local, open-source tool to detect suspicious emails (phishing or 
 
 > 📩 **Commercial use or enterprise integration?** Contact: [alessandro.bruchi@iit.it](mailto:alessandro.bruchi@iit.it)
 
+
+
+# 📩 Email Phishing Detector
+
+## Overview
+
+Email Phishing Detector is a tool designed to detect phishing emails by analyzing the subject and body of `.eml` or `.msg` files. It supports both basic AI ensemble and advanced checks such as typo-squatting and suspicious URLs.
+
+## ✨ What's new in 1.3.0
+
+- Full refactoring of `phishing_agent.py`.
+- **Basic Mode**: now uses an ensemble of 3 AI models:
+  - `mrm8488/bert-tiny-finetuned-sms-spam-detection`
+  - `bhadresh-savani/bert-base-go-emotion`
+  - `j-hartmann/emotion-english-distilroberta-base`
+- Recalculated ensemble scoring logic.
+- Added Hugging Face token management via `.env`.
+- **Advanced Mode**: typo-squatting detection (fuzzy match >= 85%), APIVoid link scanning, and critical reason forcing to phishing.
+- **Streamlit GUI**: drag & drop support, inherits CLI logic, ready for cloud deployment.
+- **Licensing**: AGPLv3. Note that AI models may have separate Hugging Face licenses.
+
 ---
 
 ## 🚀 Features
@@ -13,8 +34,8 @@ A lightweight, local, open-source tool to detect suspicious emails (phishing or 
 - 🧠 Local AI-based classification with no cloud dependency
 - 📂 Support for `.eml` and `.msg` (Outlook) email formats
 - 🤖 Three operational modes:
-  - **Basic**: BERT-based classification only
-  - **Advanced**: Adds sender reputation (via APIVoid), typosquatting detection, and URL phishing checks (via PhishTank)
+  - **Basic**: AI-based classification only
+  - **Advanced**: Adds sender reputation (via APIVoid), typosquatting detection
   - **GUI**: Web interface using Streamlit for file upload and analysis
 - 📊 Results printed in console and saved in `analysis_result.txt`
 - ✅ Optional `.env` config for API keys
@@ -53,6 +74,26 @@ pip install -r requirements.txt
 ---
 
 ## 🧪 Usage
+
+
+### CLI Version
+
+```bash
+python phishing_agent.py path_to_email.eml --mode advanced --show all
+```
+
+### Streamlit GUI Version
+
+```bash
+python -m streamlit run phishing_app.py
+```
+
+## 🔑 Environment Variables
+
+- `HUGGINGFACE_TOKEN` — Hugging Face API token for private/gated models.
+- `APIVOID_KEY` — (optional) API key for APIVoid URL reputation checking.
+
+
 
 ### 🖥️ Command-line (CLI) modes
 
@@ -96,7 +137,9 @@ phishing-agent/
 
 ## 🛡️ License
 
-This project is licensed under the **GNU Affero General Public License v3.0 (AGPLv3)**.
+- This project is licensed under **AGPLv3**.
+- **Important**: The Hugging Face models used (`bert-tiny`, `go-emotion`, `distilroberta-base`) may have additional specific licenses. Ensure compliance when using the models.
+
 
 See [LICENSE](LICENSE) for full terms.
 

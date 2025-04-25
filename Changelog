@@ -4,6 +4,39 @@ All notable changes to this project are documented here.
 
 ---
 
+## [1.3.0] - 2024-04-25
+
+### ✨ Major Refactoring
+- Revisione completa di `phishing_agent.py`.
+- Suppress avanzato di stdout/stderr (incluso "Device set to use cpu").
+- Pulizia output CLI e compatibilità con Streamlit.
+
+### 🚀 Basic Mode
+- Implementato ensemble su 3 modelli AI:
+  - `mrm8488/bert-tiny-finetuned-sms-spam-detection`
+  - `bhadresh-savani/bert-base-go-emotion`
+  - `j-hartmann/emotion-english-distilroberta-base`
+- Ricalcolo dei pesi e nuovo sistema di ensemble.
+- Aggiunta gestione di Hugging Face token tramite `.env`.
+
+### 🧠 Advanced Mode
+- Migliorato typo-squatting detection (fuzzy matching >= 85%).
+- Ripristino controllo URL con APIVoid.
+- Sistema "critical reasons" che forza score a 1.0 su indicatori gravi (es: typosquatting).
+
+### 🖥️ GUI (Streamlit)
+- Rifatta completamente `phishing_app.py`.
+- Caricamento file .eml/.msg con analisi drag&drop.
+- Eredita logica nuova della CLI.
+- Compatibile con cloud future deployment.
+
+### 📜 Licensing Note
+- Lo script rimane sotto licenza **AGPLv3**.
+- Le licenze dei modelli AI Hugging Face usati devono essere rispettate separatamente.
+
+
+---
+
 ## [1.2.0] - 2025-04-24
 ### ✨ New Features
 - 🆕 **GUI Alignment**: Updated `phishing_app_gui.py` (formerly `phishing_app.py`) to fully match CLI functionality:
