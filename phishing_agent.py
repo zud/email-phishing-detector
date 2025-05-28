@@ -1,4 +1,4 @@
-# phishing_agent.py – CLI Phishing Analyzer v1.3.0 Final (Fully Silenced + Advanced Logic)
+# phishing_agent.py – CLI Phishing Analyzer v1.4.0 Final (Fully Silenced + Advanced Logic)
 
 import os
 import re

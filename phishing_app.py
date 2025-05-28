@@ -4,7 +4,7 @@ import os
 import sys
 
 st.set_page_config(page_title="Phishing Detector", page_icon="📩")
-st.title("📩 Phishing Detector v1.3.0 (Advanced)")
+st.title("📩 Phishing Detector v1.4.0 (Advanced)")
 
 uploaded_file = st.file_uploader("Upload an email file (.eml or .msg)", type=["eml", "msg"])
 
