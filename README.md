@@ -17,7 +17,7 @@ Email Phishing Detector is a tool designed to detect phishing emails by analyzin
 ## ✨ What's new in 1.3.0
 
 - Full refactoring of `phishing_agent.py`.
-- **Basic Mode**: now uses an ensemble of 3 AI models:
+- **Basic Mode**: loads an ensemble of models from `models.yaml` (default set below):
   - `mrm8488/bert-tiny-finetuned-sms-spam-detection`
   - `bhadresh-savani/bert-base-go-emotion`
   - `j-hartmann/emotion-english-distilroberta-base`
@@ -42,13 +42,26 @@ Email Phishing Detector is a tool designed to detect phishing emails by analyzin
 
 ---
 
-## 🧠 AI Model Used
+## 🧠 AI Models
 
-- **Model**: [`mrm8488/bert-tiny-finetuned-sms-spam-detection`](https://huggingface.co/mrm8488/bert-tiny-finetuned-sms-spam-detection)
-- **Purpose**: Spam/phishing vs. ham (binary classification)
-- **Highlights**:
-  - Lightweight & fast (BERT Tiny)
-  - Works locally on CPU
+The agent loads one or more models defined in `models.yaml`. By default it uses:
+- `mrm8488/bert-tiny-finetuned-sms-spam-detection`
+- `bhadresh-savani/bert-base-go-emotion`
+- `j-hartmann/emotion-english-distilroberta-base`
+
+### Adding or replacing models
+
+Edit `models.yaml` to customize the ensemble. Each entry requires an `id` and a
+`label`. For example, you can replace a model with multilingual support using
+`xlm-roberta-base`:
+
+```yaml
+models:
+  - id: xlm-roberta-base
+    label: XLM-RoBERTa
+```
+
+The agent will load the updated list at the next run.
 
 ---
 

@@ -1,0 +1,7 @@
+models:
+  - id: mrm8488/bert-tiny-finetuned-sms-spam-detection
+    label: BERT Tiny
+  - id: bhadresh-savani/bert-base-go-emotion
+    label: Emotion Proxy
+  - id: j-hartmann/emotion-english-distilroberta-base
+    label: Hartmann Emotion
