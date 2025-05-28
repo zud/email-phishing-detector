@@ -6,6 +6,7 @@ import sys
 import io
 import traceback
 import contextlib
+import yaml
 import requests
 from bs4 import BeautifulSoup
 from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
@@ -116,11 +117,25 @@ try:
 
     combined_text = f"{subject}\n{clean_body}"
 
-    models = [
+    CONFIG_FILE = "models.yaml"
+    default_models = [
         ("mrm8488/bert-tiny-finetuned-sms-spam-detection", "BERT Tiny"),
         ("bhadresh-savani/bert-base-go-emotion", "Emotion Proxy"),
         ("j-hartmann/emotion-english-distilroberta-base", "Hartmann Emotion")
     ]
+
+    try:
+        with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+        models = [
+            (m.get("id"), m.get("label", m.get("id")))
+            for m in data.get("models", [])
+            if m.get("id")
+        ]
+        if not models:
+            models = default_models
+    except Exception:
+        models = default_models
 
     scores = []
     labels = []
